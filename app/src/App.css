@@ -1,0 +1,366 @@
+/* ── override root defaults ── */
+#root {
+  text-align: left;
+  width: 100%;
+  max-width: 100%;
+  border-inline: none;
+  display: block;
+  min-height: unset;
+}
+
+/* ── layout ── */
+.app {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── navbar ── */
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.5rem;
+  height: 58px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.nav-brand {
+  font-family: var(--heading);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-h);
+  letter-spacing: -0.5px;
+}
+
+.nav-links {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.nav-btn {
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 0.4rem 1.1rem;
+  font-size: 0.9rem;
+  font-family: var(--sans);
+  cursor: pointer;
+  color: var(--text);
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+.nav-btn:hover {
+  border-color: var(--border);
+  color: var(--text-h);
+}
+.nav-btn.active {
+  background: var(--accent-bg);
+  border-color: var(--accent-border);
+  color: var(--accent);
+}
+
+/* ── main ── */
+.main {
+  flex: 1;
+  padding: 1.75rem 1.5rem;
+}
+
+/* ── shared state messages ── */
+.state-msg {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: var(--text);
+  opacity: 0.55;
+  font-size: 1rem;
+}
+
+/* ════════════════════════════
+   PLAYER PAGE
+════════════════════════════ */
+.player-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+/* card shell */
+.card {
+  perspective: 800px;
+  aspect-ratio: 3 / 4;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 3-D flip wrapper */
+.card-inner {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 12px;
+}
+.card.folded .card-inner {
+  transform: rotateY(180deg);
+}
+
+/* shared face styles */
+.card-front,
+.card-back {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+/* front face */
+.card-front {
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+.card-front img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.card-name {
+  position: relative;
+  z-index: 1;
+  margin-top: auto;
+  padding: 0.5rem 0.6rem 0.6rem;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.72) 0%, transparent 100%);
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.2;
+}
+
+/* back face */
+.card-back {
+  transform: rotateY(180deg);
+  background: var(--accent-bg);
+  border-color: var(--accent-border);
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.card-back svg {
+  width: 60%;
+  height: 60%;
+}
+
+/* ════════════════════════════
+   MODERATOR PAGE
+════════════════════════════ */
+.moderator-page {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 2rem;
+  max-width: 1060px;
+  margin: 0 auto;
+  align-items: start;
+}
+
+.mod-section h2 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-h);
+  margin: 0 0 1rem;
+}
+
+/* ── add form ── */
+.add-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.field-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: -0.15rem;
+}
+
+.field-input {
+  padding: 0.6rem 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text-h);
+  font-size: 0.95rem;
+  font-family: var(--sans);
+  outline: none;
+  transition: border-color 0.15s;
+  width: 100%;
+  box-sizing: border-box;
+}
+.field-input:focus {
+  border-color: var(--accent-border);
+}
+
+.toggle-group {
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.toggle-btn {
+  flex: 1;
+  padding: 0.5rem;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 0.88rem;
+  font-family: var(--sans);
+  color: var(--text);
+  transition: background 0.15s, color 0.15s;
+}
+.toggle-btn + .toggle-btn {
+  border-left: 1px solid var(--border);
+}
+.toggle-btn.active {
+  background: var(--accent-bg);
+  color: var(--accent);
+}
+
+.file-input-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.file-hint {
+  font-size: 0.78rem;
+  color: var(--text);
+  opacity: 0.6;
+  margin: 0;
+}
+
+.photo-preview {
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  aspect-ratio: 3 / 2;
+}
+.photo-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.form-error {
+  font-size: 0.85rem;
+  color: #ef4444;
+  margin: 0;
+}
+
+.submit-btn {
+  padding: 0.65rem 1rem;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-family: var(--sans);
+  transition: opacity 0.15s;
+  margin-top: 0.2rem;
+}
+.submit-btn:hover:not(:disabled) {
+  opacity: 0.88;
+}
+.submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── people list ── */
+.people-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.person-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.55rem 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+}
+
+.person-thumb {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.person-name {
+  flex: 1;
+  color: var(--text-h);
+  font-size: 0.95rem;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.remove-btn {
+  background: none;
+  border: 1px solid #ef4444;
+  color: #ef4444;
+  padding: 0.3rem 0.7rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-family: var(--sans);
+  transition: background 0.15s, color 0.15s;
+  flex-shrink: 0;
+}
+.remove-btn:hover {
+  background: #ef4444;
+  color: #fff;
+}
+
+/* ── responsive ── */
+@media (max-width: 700px) {
+  .main {
+    padding: 1rem;
+  }
+
+  .player-grid {
+    gap: 0.5rem;
+  }
+
+  .moderator-page {
+    grid-template-columns: 1fr;
+  }
+}
