@@ -2,18 +2,23 @@ package main
 
 import (
 	"bufio"
+	"embed"
 	"encoding/json"
 	"fmt"
+	"io/fs"
 	"net"
 	"net/http"
 	"os"
-	"path/filepath"
+	"path"
 	"strings"
 	"sync"
 	"time"
 
 	"github.com/skip2/go-qrcode"
 )
+
+//go:embed app/dist
+var webDist embed.FS
 
 type Person struct {
 	ID    string `json:"id"`
@@ -59,6 +64,31 @@ func writePeopleToFile(filePath string, people []Person) error {
 
 func generatePersonID() string {
 	return fmt.Sprintf("person_%d", time.Now().UnixNano())
+}
+
+func createStaticHandler() (http.Handler, error) {
+	distFS, err := fs.Sub(webDist, "app/dist")
+	if err != nil {
+		return nil, err
+	}
+
+	fileServer := http.FileServerFS(distFS)
+
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		requestPath := strings.TrimPrefix(path.Clean(r.URL.Path), "/")
+		if requestPath == "." || requestPath == "" {
+			requestPath = "index.html"
+		}
+
+		if _, err := fs.Stat(distFS, requestPath); err == nil {
+			fileServer.ServeHTTP(w, r)
+			return
+		}
+
+		spaRequest := r.Clone(r.Context())
+		spaRequest.URL.Path = "/index.html"
+		fileServer.ServeHTTP(w, spaRequest)
+	}), nil
 }
 
 func getPeopleHandler(peopleFilePath string) http.HandlerFunc {
@@ -252,9 +282,12 @@ func main() {
 	}
 
 	// 4. Static File Server Logic
-	staticPath := "./app/dist"
-	indexPath := "index.html"
 	peopleFilePath := "./people.json"
+	staticHandler, err := createStaticHandler()
+	if err != nil {
+		fmt.Printf("Error preparing embedded static files: %v\n", err)
+		os.Exit(1)
+	}
 
 	if _, err := os.Stat(peopleFilePath); os.IsNotExist(err) {
 		if err := writePeopleToFile(peopleFilePath, []Person{}); err != nil {
@@ -276,30 +309,7 @@ func main() {
 		}
 	})
 
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		// Create absolute path to prevent traversal attacks
-		path, err := filepath.Abs(filepath.Join(staticPath, r.URL.Path))
-		if err != nil {
-			http.Error(w, "Bad Request", http.StatusBadRequest)
-			return
-		}
-
-		// Check if file exists
-		info, err := os.Stat(path)
-
-		// If file doesn't exist OR it's a directory (and we want to serve index.html)
-		// This enables React Router's client-side routing.
-		if os.IsNotExist(err) || (err == nil && info.IsDir()) {
-			http.ServeFile(w, r, filepath.Join(staticPath, indexPath))
-			return
-		} else if err != nil {
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			return
-		}
-
-		// Otherwise, serve the actual file (JS, CSS, Images)
-		http.FileServer(http.Dir(staticPath)).ServeHTTP(w, r)
-	})
+	http.Handle("/", staticHandler)
 
 	// 5. Start Server
 	fmt.Printf("\nServer is running at: %s\n", url)
