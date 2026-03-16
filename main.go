@@ -28,6 +28,11 @@ type Person struct {
 
 var peopleFileMutex sync.Mutex
 
+var ALLOWED_IP_PREFIXES = []string{
+	"192.",
+	"10.",
+}
+
 func readPeopleFromFile(filePath string) ([]Person, error) {
 	bytes, err := os.ReadFile(filePath)
 	if err != nil {
@@ -242,9 +247,11 @@ func getLocalIP() string {
 			ipStr := ip.String()
 
 			// 2. ONLY accept IPs starting with 192
-			if strings.HasPrefix(ipStr, "192.") {
-				fmt.Printf(">>> MATCHED LOCAL IP: %s (Interface: %s)\n", ipStr, i.Name)
-				return ipStr
+			for _, prefix := range ALLOWED_IP_PREFIXES {
+				if strings.HasPrefix(ipStr, prefix) {
+					fmt.Printf(">>> MATCHED LOCAL IP: %s (Interface: %s)\n", ipStr, i.Name)
+					return ipStr
+				}
 			}
 		}
 	}
